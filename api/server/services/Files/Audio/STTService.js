@@ -169,17 +169,26 @@ class STTService {
 
     const data = {
       file: audioReadStream,
-      model: sttSchema.model,
+      model: sttSchema.model || 'whisper-1',
     };
 
-    if (language) {
-      /** Converted locale code (e.g., "en-US") to ISO-639-1 format (e.g., "en") */
-      const isoLanguage = language.split('-')[0];
-      data.language = isoLanguage;
+    // Language parameter removed - API will auto-detect language
+    // if (language) {
+    //   const isoLanguage = language.split('-')[0];
+    //   data.language = isoLanguage;
+    // }
+
+    if (sttSchema?.response_format) {
+      data.response_format = sttSchema.response_format;
+    }
+
+    if (sttSchema?.temperature !== undefined) {
+      data.temperature = sttSchema.temperature;
     }
 
     const headers = {
       'Content-Type': 'multipart/form-data',
+      'ngrok-skip-browser-warning': 'true', // Add ngrok header for ngrok URLs
       ...(apiKey && { Authorization: `Bearer ${apiKey}` }),
     };
     [headers].forEach(this.removeUndefined);
