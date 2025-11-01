@@ -350,6 +350,7 @@ export type TAskProps = {
   overrideUserMessageId?: string;
   parentMessageId?: string | null;
   conversationId?: string | null;
+  position?: { latitude: number; longitude: number }
   messageId?: string | null;
   clientTimestamp?: string;
 };

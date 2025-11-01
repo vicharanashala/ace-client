@@ -75,6 +75,7 @@ export default function useChatFunctions({
     {
       text,
       overrideConvoId,
+      position,
       overrideUserMessageId,
       parentMessageId = null,
       conversationId = null,
@@ -194,8 +195,13 @@ export default function useChatFunctions({
     }
     const responseSender = getSender({ model: conversation?.model, ...endpointOption });
 
+    const positionText =
+      position && position.latitude && position.longitude
+        ? `\n\n(location): latitude:${position.latitude}, longitude:${position.longitude})`
+        : '';
+
     const currentMsg: TMessage = {
-      text,
+      text: `${text}${positionText}`,
       sender: 'User',
       clientTimestamp: new Date().toLocaleString('sv').replace(' ', 'T'),
       isCreatedByUser: true,
@@ -327,7 +333,6 @@ export default function useChatFunctions({
     if (index === 0 && setLatestMessage) {
       setLatestMessage(initialResponse);
     }
-
     setSubmission(submission);
     logger.dir('message_stream', submission, { depth: null });
   };

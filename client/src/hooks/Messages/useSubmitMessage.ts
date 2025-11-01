@@ -24,7 +24,7 @@ export default function useSubmitMessage() {
   const setActivePrompt = useSetRecoilState(store.activePromptByIndex(index));
 
   const submitMessage = useCallback(
-    (data?: { text: string }) => {
+    (data?: { text: string }, position?: { latitude: number; longitude: number }) => {
       if (!data) {
         return console.warn('No data provided to submitMessage');
       }
@@ -48,6 +48,7 @@ export default function useSubmitMessage() {
 
       ask({
         text: data.text,
+        position,
         overrideConvoId: appendIndex(rootIndex, overrideConvoId),
         overrideUserMessageId: appendIndex(rootIndex, overrideUserMessageId),
         clientTimestamp,
