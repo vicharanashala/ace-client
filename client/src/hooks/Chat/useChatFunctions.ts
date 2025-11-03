@@ -126,6 +126,12 @@ export default function useChatFunctions({
         text: conversation.promptPrefix,
         user,
       });
+
+      // Append location data to prompt prefix if available
+      if (position && position.latitude && position.longitude) {
+        const locationText = `\n\nLocation:\nLatitude:${position.latitude}\nLongitude:${position.longitude}`;
+        conversation.promptPrefix += locationText;
+      }
     }
 
     // construct the query message
@@ -195,13 +201,8 @@ export default function useChatFunctions({
     }
     const responseSender = getSender({ model: conversation?.model, ...endpointOption });
 
-    const positionText =
-      position && position.latitude && position.longitude
-        ? `\n\n(location): latitude:${position.latitude}, longitude:${position.longitude})`
-        : '';
-
     const currentMsg: TMessage = {
-      text: `${text}${positionText}`,
+      text,
       sender: 'User',
       clientTimestamp: new Date().toLocaleString('sv').replace(' ', 'T'),
       isCreatedByUser: true,
