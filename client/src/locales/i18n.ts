@@ -40,8 +40,7 @@ import translationUk from './uk/translation.json';
 import translationBs from './bs/translation.json';
 import translationNb from './nb/translation.json';
 import translationSl from './sl/translation.json';
-import translationMl from './ml/translation.json';
-
+import translationPa from './pa/translation.json';
 export const defaultNS = 'translation';
 
 export const resources = {
@@ -82,7 +81,7 @@ export const resources = {
   bo: { translation: translationBo },
   sl: { translation: translationSl },
   uk: { translation: translationUk },
-  ml: { translation: translationMl },
+  pa: { translation: translationPa },
 } as const;
 
 i18n
@@ -93,7 +92,7 @@ i18n
       'zh-TW': ['zh-Hant', 'en'],
       'zh-HK': ['zh-Hant', 'en'],
       zh: ['zh-Hans', 'en'],
-      ml: ['en'],
+      pa: ['en'],
       default: ['en'],
     },
     fallbackNS: 'translation',
