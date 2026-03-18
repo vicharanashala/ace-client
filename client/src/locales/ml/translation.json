@@ -1,0 +1,50 @@
+{
+  "chat_direction_left_to_right": "ഇടത് മുതൽ വലത്തേക്ക്",
+  "chat_direction_right_to_left": "വലത് മുതൽ ഇടത്തേക്ക്",
+
+  "com_a11y_ai_composing": "AI ഇപ്പോഴും എഴുതുകയാണ്.",
+  "com_a11y_end": "AI തന്റെ മറുപടി പൂർത്തിയാക്കി.",
+  "com_a11y_start": "AI മറുപടി തുടങ്ങിച്ചു.",
+
+  "com_auth_login": "ലോഗിൻ",
+  "com_auth_email": "ഇമെയിൽ",
+  "com_auth_email_address": "ഇമെയിൽ വിലാസം",
+  "com_auth_password": "പാസ്‌വേഡ്",
+  "com_auth_password_confirm": "പാസ്‌വേഡ് സ്ഥിരീകരിക്കുക",
+  "com_auth_forgot_password": "പാസ്‌വേഡ് മറന്നോ?",
+  "com_auth_sign_in": "സൈൻ ഇൻ",
+  "com_auth_sign_up": "സൈൻ അപ്",
+  "com_auth_logout": "ലോഗ് ഔട്ട്",
+  "com_auth_welcome_back": "വീണ്ടും സ്വാഗതം",
+
+  "com_nav_language": "ഭാഷ",
+  "com_nav_settings": "സജ്ജീകരണങ്ങൾ",
+  "com_nav_log_out": "ലോഗ് ഔട്ട്",
+  "com_nav_theme": "തീം",
+  "com_nav_theme_dark": "ഡാർക്ക്",
+  "com_nav_theme_light": "ലൈറ്റ്",
+  "com_nav_theme_system": "സിസ്റ്റം",
+
+  "com_nav_new_chat": "പുതിയ ചാറ്റ്",
+  "com_nav_clear_all_chats": "എല്ലാ ചാറ്റുകളും നീക്കം ചെയ്യുക",
+
+  "com_ui_send": "അയയ്ക്കുക",
+  "com_ui_cancel": "റദ്ദാക്കുക",
+  "com_ui_save": "സംരക്ഷിക്കുക",
+  "com_ui_delete": "ഇല്ലാതാക്കുക",
+  "com_ui_edit": "തിരുത്തുക",
+  "com_ui_close": "അടയ്ക്കുക",
+  "com_ui_search": "തിരയുക",
+  "com_ui_loading": "ലോഡുചെയ്യുന്നു...",
+  "com_ui_submit": "സമർപ്പിക്കുക",
+
+  "com_ui_yes": "അതെ",
+  "com_ui_no": "ഇല്ല",
+
+  "com_ui_error": "പിശക്",
+  "com_ui_success": "വിജയം",
+
+  "com_user_message": "നിങ്ങൾ",
+
+  "com_nav_lang_malayalam": "മലയാളം"
+}
