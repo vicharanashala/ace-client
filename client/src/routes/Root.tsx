@@ -30,7 +30,7 @@ export default function Root() {
     return savedNavVisible !== null ? JSON.parse(savedNavVisible) : true;
   });
 
-  const { isAuthenticated, logout } = useAuthContext();
+  const { isAuthenticated, logout, user } = useAuthContext();
 
   // Global health check - runs once per authenticated session
   useHealthCheck(isAuthenticated);
@@ -46,21 +46,23 @@ export default function Root() {
 
   useSearchEnabled(isAuthenticated);
 
+  const noticeKey = `hasAcceptedTestingNotice_${user?.id ?? 'guest'}`;
+
   useEffect(() => {
     if (termsData) {
       setShowTerms(!termsData.termsAccepted);
       if (termsData.termsAccepted) {
-        const hasAcceptedNotice = localStorage.getItem('hasAcceptedTestingNotice');
+        const hasAcceptedNotice = localStorage.getItem(noticeKey);
         if (!hasAcceptedNotice) {
           setShowTestingNotice(true);
         }
       }
     }
-  }, [termsData]);
+  }, [termsData, noticeKey]);
 
   const handleAcceptTerms = () => {
     setShowTerms(false);
-    const hasAcceptedNotice = localStorage.getItem('hasAcceptedTestingNotice');
+    const hasAcceptedNotice = localStorage.getItem(noticeKey);
     if (!hasAcceptedNotice) {
       setShowTestingNotice(true);
     }
@@ -72,13 +74,13 @@ export default function Root() {
   };
 
   const handleAcceptTestingNotice = () => {
-    localStorage.setItem('hasAcceptedTestingNotice', 'true');
+    localStorage.setItem(noticeKey, 'true');
     setShowTestingNotice(false);
   };
 
   const handleDeclineTestingNotice = () => {
     setShowTestingNotice(false);
-    logout('/register');
+    logout('/login');
   };
 
   if (!isAuthenticated) {
