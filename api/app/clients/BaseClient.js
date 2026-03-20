@@ -2,7 +2,9 @@ const crypto = require('crypto');
 const fetch = require('node-fetch');
 const { logger } = require('@librechat/data-schemas');
 const {
+  countTokens,
   getBalanceConfig,
+  extractFileContext,
   encodeAndFormatAudios,
   encodeAndFormatVideos,
   encodeAndFormatDocuments,
@@ -10,6 +12,7 @@ const {
 const {
   Constants,
   ErrorTypes,
+  FileSources,
   ContentTypes,
   excludedKeys,
   EModelEndpoint,
@@ -17,11 +20,17 @@ const {
   isAgentsEndpoint,
   supportsBalanceCheck,
 } = require('librechat-data-provider');
-const { getMessages, saveMessage, updateMessage, saveConvo, getConvo } = require('~/models');
+const {
+  updateMessage,
+  getMessages,
+  saveMessage,
+  saveConvo,
+  getConvo,
+  getFiles,
+} = require('~/models');
 const { getStrategyFunctions } = require('~/server/services/Files/strategies');
 const { checkBalance } = require('~/models/balanceMethods');
 const { truncateToolCallOutputs } = require('./prompts');
-const { getFiles } = require('~/models/File');
 const TextStream = require('./TextStream');
 
 class BaseClient {
@@ -78,6 +87,7 @@ class BaseClient {
     throw new Error("Method 'getCompletion' must be implemented.");
   }
 
+  /** @type {sendCompletion} */
   async sendCompletion() {
     throw new Error("Method 'sendCompletion' must be implemented.");
   }
@@ -687,8 +697,7 @@ class BaseClient {
       });
     }
 
-    /** @type {string|string[]|undefined} */
-    const completion = await this.sendCompletion(payload, opts);
+    const { completion, metadata } = await this.sendCompletion(payload, opts);
     if (this.abortController) {
       this.abortController.requestCompleted = true;
     }
@@ -706,6 +715,7 @@ class BaseClient {
       iconURL: this.options.iconURL,
       endpoint: this.options.endpoint,
       ...(this.metadata ?? {}),
+      metadata,
     };
 
     if (typeof completion === 'string') {
@@ -957,6 +967,13 @@ class BaseClient {
 
     const unsetFields = {};
     const exceptions = new Set(['spec', 'iconURL']);
+    const hasNonEphemeralAgent =
+      isAgentsEndpoint(this.options.endpoint) &&
+      endpointOptions?.agent_id &&
+      endpointOptions.agent_id !== Constants.EPHEMERAL_AGENT_ID;
+    if (hasNonEphemeralAgent) {
+      exceptions.add('model');
+    }
     if (existingConvo != null) {
       this.fetchedConvo = true;
       for (const key in existingConvo) {
@@ -1210,7 +1227,8 @@ class BaseClient {
       this.options.req,
       attachments,
       {
-        provider: this.options.agent?.provider,
+        provider: this.options.agent?.provider ?? this.options.endpoint,
+        endpoint: this.options.agent?.endpoint ?? this.options.endpoint,
         useResponsesApi: this.options.agent?.model_parameters?.useResponsesApi,
       },
       getStrategyFunctions,
@@ -1226,7 +1244,10 @@ class BaseClient {
     const videoResult = await encodeAndFormatVideos(
       this.options.req,
       attachments,
-      this.options.agent.provider,
+      {
+        provider: this.options.agent?.provider ?? this.options.endpoint,
+        endpoint: this.options.agent?.endpoint ?? this.options.endpoint,
+      },
       getStrategyFunctions,
     );
     message.videos =
@@ -1238,7 +1259,10 @@ class BaseClient {
     const audioResult = await encodeAndFormatAudios(
       this.options.req,
       attachments,
-      this.options.agent.provider,
+      {
+        provider: this.options.agent?.provider ?? this.options.endpoint,
+        endpoint: this.options.agent?.endpoint ?? this.options.endpoint,
+      },
       getStrategyFunctions,
     );
     message.audios =
@@ -1246,27 +1270,62 @@ class BaseClient {
     return audioResult.files;
   }
 
+  /**
+   * Extracts text context from attachments and sets it on the message.
+   * This handles text that was already extracted from files (OCR, transcriptions, document text, etc.)
+   * @param {TMessage} message - The message to add context to
+   * @param {MongoFile[]} attachments - Array of file attachments
+   * @returns {Promise<void>}
+   */
+  async addFileContextToMessage(message, attachments) {
+    const fileContext = await extractFileContext({
+      attachments,
+      req: this.options?.req,
+      tokenCountFn: (text) => countTokens(text),
+    });
+
+    if (fileContext) {
+      message.fileContext = fileContext;
+    }
+  }
+
   async processAttachments(message, attachments) {
     const categorizedAttachments = {
       images: [],
-      documents: [],
       videos: [],
       audios: [],
+      documents: [],
     };
 
+    const allFiles = [];
+
     for (const file of attachments) {
+      /** @type {FileSources} */
+      const source = file.source ?? FileSources.local;
+      if (source === FileSources.text) {
+        allFiles.push(file);
+        continue;
+      }
+      if (file.embedded === true || file.metadata?.fileIdentifier != null) {
+        allFiles.push(file);
+        continue;
+      }
+
       if (file.type.startsWith('image/')) {
         categorizedAttachments.images.push(file);
       } else if (file.type === 'application/pdf') {
         categorizedAttachments.documents.push(file);
+        allFiles.push(file);
       } else if (file.type.startsWith('video/')) {
         categorizedAttachments.videos.push(file);
+        allFiles.push(file);
       } else if (file.type.startsWith('audio/')) {
         categorizedAttachments.audios.push(file);
+        allFiles.push(file);
       }
     }
 
-    const [imageFiles, documentFiles, videoFiles, audioFiles] = await Promise.all([
+    const [imageFiles] = await Promise.all([
       categorizedAttachments.images.length > 0
         ? this.addImageURLs(message, categorizedAttachments.images)
         : Promise.resolve([]),
@@ -1281,7 +1340,8 @@ class BaseClient {
         : Promise.resolve([]),
     ]);
 
-    const allFiles = [...imageFiles, ...documentFiles, ...videoFiles, ...audioFiles];
+    allFiles.push(...imageFiles);
+
     const seenFileIds = new Set();
     const uniqueFiles = [];
 
@@ -1346,6 +1406,7 @@ class BaseClient {
         {},
       );
 
+      await this.addFileContextToMessage(message, files);
       await this.processAttachments(message, files);
 
       this.message_file_map[message.messageId] = files;

@@ -1,5 +1,6 @@
 import { useState, useMemo, memo, useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
+import MarkdownLite from '../Chat/Messages/Content/MarkdownLite';
 import { Atom, ChevronDown } from 'lucide-react';
 import type { MouseEvent, FC } from 'react';
 import { useLocalize } from '~/hooks';
@@ -24,7 +25,12 @@ export const ThinkingContent: FC<{ children: React.ReactNode; isPart?: boolean }
   ({ isPart, children }) => (
     <div className={CONTENT_STYLES.wrapper}>
       <div className={isPart === true ? CONTENT_STYLES.partBorder : CONTENT_STYLES.border} />
-      <p className={CONTENT_STYLES.text}>{children}</p>
+      <div className={cn(CONTENT_STYLES.text, 'markdown prose dark:prose-invert light break-words')}>
+      <MarkdownLite
+          content={typeof children === 'string' ? children : String(children ?? '')}
+         codeExecution={false}
+      />
+      </div>
     </div>
   ),
 );
