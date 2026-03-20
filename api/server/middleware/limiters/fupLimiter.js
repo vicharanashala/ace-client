@@ -1,11 +1,13 @@
 const rateLimit = require('express-rate-limit');
 
-const FUP_LIMIT = 2;
+const FUP_LIMIT = 30;
 const FUP_WINDOW_MS = 24 * 60 * 60 * 1000; // 1 day
 
 // ✅ Generate all restricted emails from dummyuser1 to dummyuser1000
 const RESTRICTED_EMAILS = new Set(
-  Array.from({ length: 1005 }, (_, i) => `dummyuser${i + 1}@gmail.com`)
+  Array.from({ length: 1000 }, (_, i) =>
+    `rup${String(i + 1).padStart(4, "0")}@gmail.com`
+  )
 );
 
 const fupLimiter = rateLimit({
