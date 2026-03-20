@@ -2,9 +2,10 @@ import { cn } from '~/utils/';
 
 type ListeningIconProps = {
   className?: string;
+  style?: React.CSSProperties;
 };
 
-export default function ListeningIcon({ className }: ListeningIconProps) {
+export default function ListeningIcon({ className, style }: ListeningIconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -13,6 +14,7 @@ export default function ListeningIcon({ className }: ListeningIconProps) {
       viewBox="0 0 24 24"
       fill="none"
       className={cn(className)}
+      style={style}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
