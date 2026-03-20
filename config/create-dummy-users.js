@@ -25,7 +25,7 @@ const createDummyUsers = async (count = 1000) => {
   // Generate users
   for (let i = 1; i <= count; i++) {
     users.push({
-      email: `dummyUser${i}@gmail.com`,
+      email: `dummyuser${i}@gmail.com`,
       username: `dummyUser${i}`,
       name: `dummyUser${i}`,
       password: `dummyUser${i}`,

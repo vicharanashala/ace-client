@@ -76,6 +76,7 @@ export default function useChatFunctions({
     {
       text,
       overrideConvoId,
+      position,
       overrideUserMessageId,
       parentMessageId = null,
       conversationId = null,
@@ -126,6 +127,12 @@ export default function useChatFunctions({
         text: conversation.promptPrefix,
         user,
       });
+
+      // Append location data to prompt prefix if available
+      if (position && position.latitude && position.longitude) {
+        const locationText = `\n\nLocation:\nLatitude:${position.latitude}\nLongitude:${position.longitude}`;
+        conversation.promptPrefix += locationText;
+      }
     }
 
     // construct the query message
@@ -329,7 +336,6 @@ export default function useChatFunctions({
     if (index === 0 && setLatestMessage) {
       setLatestMessage(initialResponse);
     }
-
     setSubmission(submission);
     logger.dir('message_stream', submission, { depth: null });
   };
