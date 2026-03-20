@@ -16,13 +16,14 @@ import {
   FileMapContext,
 } from '~/Providers';
 import { useUserTermsQuery, useGetStartupConfig } from '~/data-provider';
-import { TermsAndConditionsModal } from '~/components/ui';
+import { TermsAndConditionsModal, ImportantNoticeModal } from '~/components/ui';
 import { Nav, MobileNav } from '~/components/Nav';
 import { useHealthCheck } from '~/data-provider';
 import { Banner } from '~/components/Banners';
 
 export default function Root() {
   const [showTerms, setShowTerms] = useState(false);
+  const [showTestingNotice, setShowTestingNotice] = useState(false);
   const [bannerHeight, setBannerHeight] = useState(0);
   const [navVisible, setNavVisible] = useState(() => {
     const savedNavVisible = localStorage.getItem('navVisible');
@@ -48,16 +49,36 @@ export default function Root() {
   useEffect(() => {
     if (termsData) {
       setShowTerms(!termsData.termsAccepted);
+      if (termsData.termsAccepted) {
+        const hasAcceptedNotice = localStorage.getItem('hasAcceptedTestingNotice');
+        if (!hasAcceptedNotice) {
+          setShowTestingNotice(true);
+        }
+      }
     }
   }, [termsData]);
 
   const handleAcceptTerms = () => {
     setShowTerms(false);
+    const hasAcceptedNotice = localStorage.getItem('hasAcceptedTestingNotice');
+    if (!hasAcceptedNotice) {
+      setShowTestingNotice(true);
+    }
   };
 
   const handleDeclineTerms = () => {
     setShowTerms(false);
     logout('/login?redirect=false');
+  };
+
+  const handleAcceptTestingNotice = () => {
+    localStorage.setItem('hasAcceptedTestingNotice', 'true');
+    setShowTestingNotice(false);
+  };
+
+  const handleDeclineTestingNotice = () => {
+    setShowTestingNotice(false);
+    logout('/register');
   };
 
   if (!isAuthenticated) {
@@ -92,6 +113,12 @@ export default function Root() {
               modalContent={config.interface.termsOfService.modalContent}
             />
           )}
+          <ImportantNoticeModal
+            open={showTestingNotice}
+            onOpenChange={setShowTestingNotice}
+            onAccept={handleAcceptTestingNotice}
+            onDecline={handleDeclineTestingNotice}
+          />
         </AssistantsMapContext.Provider>
       </FileMapContext.Provider>
     </SetConvoProvider>
