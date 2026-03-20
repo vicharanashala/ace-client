@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { OGDialog, DialogTemplate, useToastContext } from '@librechat/client';
 import type { TTermsOfService } from 'librechat-data-provider';
 import MarkdownLite from '~/components/Chat/Messages/Content/MarkdownLite';
@@ -49,7 +50,19 @@ const TermsAndConditionsModal = ({
     onOpenChange(isOpen);
   };
 
+  const { i18n } = useTranslation();
+
   const content = useMemo(() => {
+    // If browser language is Punjabi, use the translated content
+    const currentLang = i18n.language || navigator.language || '';
+    if (currentLang.startsWith('pa')) {
+      const translated = i18n.t('com_ui_terms_modal_content', { defaultValue: '' });
+      if (translated && translated !== 'com_ui_terms_modal_content') {
+        return translated;
+      }
+    }
+
+    // Otherwise use the default content from YAML config (English)
     if (typeof modalContent === 'string') {
       return modalContent;
     }
@@ -59,7 +72,8 @@ const TermsAndConditionsModal = ({
     }
 
     return '';
-  }, [modalContent]);
+  }, [modalContent, i18n.language]);
+
 
   return (
     <OGDialog open={open} onOpenChange={handleOpenChange}>
