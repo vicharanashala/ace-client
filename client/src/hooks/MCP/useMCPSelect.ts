@@ -23,6 +23,14 @@ export function useMCPSelect({
   const [mcpValues, setMCPValuesRaw] = useAtom(mcpValuesAtomFamily(key));
   const [ephemeralAgent, setEphemeralAgent] = useRecoilState(ephemeralAgentByConvoId(key));
 
+  // Select all servers by default when servers are available and nothing is selected
+  useEffect(() => {
+    if (servers?.length > 0 && mcpValues.length === 0) {
+      const allServerNames = servers.map((s) => s.serverName);
+      setMCPValuesRaw(allServerNames);
+    }
+  }, [servers, mcpValues.length, setMCPValuesRaw]);
+
   // Sync Jotai state with ephemeral agent state
   useEffect(() => {
     const mcps = ephemeralAgent?.mcp ?? [];
@@ -51,16 +59,21 @@ export function useMCPSelect({
     }
   }, [mcpValues, key]);
 
+  /** Deliberately swallows clicks so servers can NEVER be unselected */
+  const setMCPValues = useCallback(() => {
+    // Locked on purpose
+  }, []);
+
   /** Stable memoized setter */
-  const setMCPValues = useCallback(
-    (value: string[]) => {
-      if (!Array.isArray(value)) {
-        return;
-      }
-      setMCPValuesRaw(value);
-    },
-    [setMCPValuesRaw],
-  );
+  // const setMCPValues = useCallback(
+  //   (value: string[]) => {
+  //     if (!Array.isArray(value)) {
+  //       return;
+  //     }
+  //     setMCPValuesRaw(value);
+  //   },
+  //   [setMCPValuesRaw],
+  // );
 
   return {
     isPinned,
