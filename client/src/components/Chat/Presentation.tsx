@@ -8,6 +8,7 @@ import { EditorProvider, SidePanelProvider, ArtifactsProvider } from '~/Provider
 import Artifacts from '~/components/Artifacts/Artifacts';
 import { SidePanelGroup } from '~/components/SidePanel';
 import { useSetFilesToDelete } from '~/hooks';
+import { Banner } from '~/components/Banners';
 import store from '~/store';
 
 export default function Presentation({ children }: { children: React.ReactNode }) {
@@ -84,6 +85,7 @@ export default function Presentation({ children }: { children: React.ReactNode }
           artifacts={artifactsElement}
         >
           <main className="flex h-full flex-col overflow-y-auto" role="main">
+            <Banner />
             {children}
           </main>
         </SidePanelGroup>
