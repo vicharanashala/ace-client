@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useMediaQuery } from '@librechat/client';
 import { useOutletContext } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -37,6 +38,26 @@ export default function Header() {
 
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
 
+  const [bannerPortal, setBannerPortal] = useState<Element | null>(null);
+
+  useEffect(() => {
+    const node = document.getElementById('banner-left-portal');
+    if (node) setBannerPortal(node);
+    const observer = new MutationObserver(() => {
+      const p = document.getElementById('banner-left-portal');
+      if (p !== bannerPortal) setBannerPortal(p);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [bannerPortal]);
+
+  const modelSelectorNodes = (
+    <div className="flex items-center gap-2">
+      <ModelSelector startupConfig={startupConfig} />
+      {interfaceConfig.presets === true && interfaceConfig.modelSelect && <PresetsMenu />}
+    </div>
+  );
+
   return (
     <div className="sticky top-0 z-10 flex h-14 w-full items-center justify-between bg-white p-2 font-semibold text-text-primary dark:bg-gray-800">
       <div className="hide-scrollbar flex w-full items-center justify-between gap-2 overflow-x-auto">
@@ -56,6 +77,7 @@ export default function Header() {
               </motion.div>
             )}
           </AnimatePresence>
+          {bannerPortal ? createPortal(modelSelectorNodes, bannerPortal) : null}
           {!(navVisible && isSmallScreen) && (
             <div
               className={cn(
@@ -64,8 +86,7 @@ export default function Header() {
                 !navVisible && !isSmallScreen ? 'pl-2' : '',
               )}
             >
-              <ModelSelector startupConfig={startupConfig} />
-              {interfaceConfig.presets === true && interfaceConfig.modelSelect && <PresetsMenu />}
+              {!bannerPortal && modelSelectorNodes}
               {hasAccessToBookmarks === true && <BookmarkMenu />}
               {hasAccessToMultiConvo === true && <AddMultiConvo />}
               {isSmallScreen && (

@@ -16,6 +16,22 @@ export const Banner = ({ onHeightChange }: { onHeightChange?: (height: number) =
     }
   }, [banner, hideBannerHint, onHeightChange]);
 
+  useEffect(() => {
+    const portal = document.getElementById('banner-left-portal');
+    const spacer = document.getElementById('banner-right-spacer');
+    if (!portal || !spacer) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === portal) {
+          spacer.style.width = `${entry.contentRect.width}px`;
+        }
+      }
+    });
+    observer.observe(portal);
+    return () => observer.disconnect();
+  }, [banner, hideBannerHint]);
+
   if (
     !banner ||
     (banner.bannerId && !banner.persistable && hideBannerHint.includes(banner.bannerId))
@@ -38,26 +54,19 @@ export const Banner = ({ onHeightChange }: { onHeightChange?: (height: number) =
   return (
     <div
       ref={bannerRef}
-      className="sticky top-0 z-20 flex items-center bg-presentation px-3 py-2 text-black dark:text-white md:relative"
+      className="sticky top-0 z-20 flex w-full items-center justify-between bg-presentation px-3 py-2 text-black dark:text-white md:relative"
     >
+      <div id="banner-left-portal" className="flex items-center min-w-[max-content] z-30"></div>
       <div
         className={cn(
-          'w-full whitespace-pre-line text-center text-sm text-black dark:text-white md:text-base lg:text-lg',
+          'flex-1 whitespace-pre-line text-center text-sm text-black dark:text-white md:text-base lg:text-lg',
           !banner.persistable && 'px-4',
         )}
         dangerouslySetInnerHTML={{ __html: formattedMessage }}
       ></div>
-      {/*{!banner.persistable && (
-        <Button
-          size="icon"
-          variant="ghost"
-          aria-label="Dismiss banner"
-          className="size-8"
-          onClick={onClick}
-        >
-          <XIcon className="mx-auto h-4 w-4 text-text-primary" aria-hidden="true" />
-        </Button>
-      )}*/}
+      <div className="flex items-center min-w-[max-content] invisible pointer-events-none">
+         <div id="banner-right-spacer" style={{ width: 'var(--banner-left-width, 0px)' }}></div>
+      </div>
     </div>
   );
 };
