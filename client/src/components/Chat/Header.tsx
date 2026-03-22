@@ -55,6 +55,7 @@ export default function Header() {
     <div className="flex items-center gap-2">
       <ModelSelector startupConfig={startupConfig} />
       {interfaceConfig.presets === true && interfaceConfig.modelSelect && <PresetsMenu />}
+      {hasAccessToMultiConvo === true && <AddMultiConvo />}
     </div>
   );
 
@@ -88,7 +89,6 @@ export default function Header() {
             >
               {!bannerPortal && modelSelectorNodes}
               {hasAccessToBookmarks === true && <BookmarkMenu />}
-              {hasAccessToMultiConvo === true && <AddMultiConvo />}
               {isSmallScreen && (
                 <>
                   <ExportAndShareMenu

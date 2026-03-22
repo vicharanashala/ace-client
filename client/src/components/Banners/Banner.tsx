@@ -16,22 +16,6 @@ export const Banner = ({ onHeightChange }: { onHeightChange?: (height: number) =
     }
   }, [banner, hideBannerHint, onHeightChange]);
 
-  useEffect(() => {
-    const portal = document.getElementById('banner-left-portal');
-    const spacer = document.getElementById('banner-right-spacer');
-    if (!portal || !spacer) return;
-
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target === portal) {
-          spacer.style.width = `${entry.contentRect.width}px`;
-        }
-      }
-    });
-    observer.observe(portal);
-    return () => observer.disconnect();
-  }, [banner, hideBannerHint]);
-
   if (
     !banner ||
     (banner.bannerId && !banner.persistable && hideBannerHint.includes(banner.bannerId))
@@ -64,9 +48,6 @@ export const Banner = ({ onHeightChange }: { onHeightChange?: (height: number) =
         )}
         dangerouslySetInnerHTML={{ __html: formattedMessage }}
       ></div>
-      <div className="flex items-center min-w-[max-content] invisible pointer-events-none">
-         <div id="banner-right-spacer" style={{ width: 'var(--banner-left-width, 0px)' }}></div>
-      </div>
     </div>
   );
 };
