@@ -1,5 +1,4 @@
 import { useCallback, useRef } from 'react';
-import { MicOff } from 'lucide-react';
 import { useToastContext, TooltipAnchor, ListeningIcon, Spinner } from '@librechat/client';
 import { useLocalize, useSpeechToText, useGetAudioSettings } from '~/hooks';
 import { useChatFormContext } from '~/Providers';
@@ -96,12 +95,12 @@ export default function AudioRecorder({
 
   const renderIcon = () => {
     if (isListening === true) {
-      return <MicOff className="stroke-red-500" size={29} />;
+      return <ListeningIcon className="stroke-green-500" style={{ width: 24, height: 24 }} />;
     }
     if (isLoading === true) {
-      return <Spinner className="stroke-text-secondary" size={29} />;
+      return <Spinner className="stroke-text-secondary" size={24} />;
     }
-    return <ListeningIcon className="stroke-text-secondary" style={{ width: 29, height: 29 }} />;
+    return <ListeningIcon className="stroke-text-secondary" style={{ width: 24, height: 24 }} />;
   };
 
   return (
@@ -115,11 +114,14 @@ export default function AudioRecorder({
           onClick={isListening === true ? handleStopRecording : handleStartRecording}
           disabled={disabled}
           className={cn(
-            'flex size-10 items-center justify-center rounded-full p-1 transition-colors hover:bg-surface-hover',
+            'relative flex size-7 items-center justify-center self-center rounded-full p-1 transition-colors hover:bg-surface-hover mr-1',
           )}
           title={localize('com_ui_use_micrphone')}
           aria-pressed={isListening}
         >
+          {isListening === true && (
+            <span className="absolute inset-0 animate-pulse rounded-full bg-green-500/25 [animation-duration:0.20s]" />
+          )}
           {renderIcon()}
         </button>
       }
