@@ -24,12 +24,13 @@ const createDummyUsers = async (count = 1000) => {
 
   // Generate users
   for (let i = 1; i <= count; i++) {
+    const padded = String(i).padStart(4, '0');
     users.push({
-      email: `dummyUser${i}@gmail.com`,
-      username: `dummyUser${i}`,
-      name: `dummyUser${i}`,
-      password: `dummyUser${i}`,
-      confirm_password: `dummyUser${i}`,
+      email: `rup${padded}@gmail.com`,
+      username: `RUP${padded}`,
+      name: `rup${padded}`,
+      password: `RUP@${padded}`,
+      confirm_password: `RUP@${padded}`,
     });
   }
 
