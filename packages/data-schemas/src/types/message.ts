@@ -42,4 +42,5 @@ export interface IMessage extends Document {
   expiredAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  turnId?: string;
 }
