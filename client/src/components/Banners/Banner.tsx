@@ -46,7 +46,7 @@ export const Banner = ({ onHeightChange }: { onHeightChange?: (height: number) =
           id="banner-left-portal" 
           className="flex min-w-[max-content] items-center scale-[0.85] origin-right sm:scale-100 sm:origin-left"
         ></div>
-        <div className="scale-[0.85] origin-left sm:scale-100">
+        <div className="scale-[0.85] origin-left sm:scale-100 hidden md:block">
           <TestingVersion />
         </div>
       </div>
