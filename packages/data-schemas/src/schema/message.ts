@@ -140,11 +140,6 @@ const messageSchema: Schema<IMessage> = new Schema(
     expiredAt: {
       type: Date,
     },
-    turnId: {
-      type: String,
-      index: true,
-      default: null,
-    },
   },
   { timestamps: true },
 );

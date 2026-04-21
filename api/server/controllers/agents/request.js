@@ -1,4 +1,3 @@
-const { v4: uuidv4 } = require('uuid');
 const { logger } = require('@librechat/data-schemas');
 const { Constants } = require('librechat-data-provider');
 const {
@@ -58,7 +57,6 @@ const AgentController = async (req, res, next, initializeClient, addTitle) => {
 
   const newConvo = !conversationId;
   const userId = req.user.id;
-  const turnId = uuidv4();
 
   // Create handler to avoid capturing the entire parent scope
   let getReqData = (data = {}) => {
@@ -260,7 +258,7 @@ const AgentController = async (req, res, next, initializeClient, addTitle) => {
       if (client.savedMessageIds && !client.savedMessageIds.has(messageId)) {
         await saveMessage(
           req,
-          { ...finalResponse, user: userId, turnId },
+          { ...finalResponse, user: userId },
           { context: 'api/server/controllers/agents/request.js - response end' },
         );
       }
@@ -288,7 +286,7 @@ const AgentController = async (req, res, next, initializeClient, addTitle) => {
 
     // Save user message if needed
     if (!client.skipSaveUserMessage) {
-      await saveMessage(req, { ...userMessage, turnId }, {
+      await saveMessage(req, userMessage, {
         context: "api/server/controllers/agents/request.js - don't skip saving user message",
       });
     }
