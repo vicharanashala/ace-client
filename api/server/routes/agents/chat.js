@@ -13,6 +13,7 @@ const { initializeClient } = require('~/server/services/Endpoints/agents');
 const AgentController = require('~/server/controllers/agents/request');
 const addTitle = require('~/server/services/Endpoints/agents/title');
 const { getRoleByName } = require('~/models/Role');
+const fupLimiter = require('~/server/middleware/limiters/fupLimiter');
 
 const router = express.Router();
 
@@ -32,6 +33,7 @@ router.use(checkAgentAccess);
 router.use(checkAgentResourceAccess);
 router.use(validateConvoAccess);
 router.use(buildEndpointOption);
+router.use(fupLimiter); 
 router.use(setHeaders);
 
 const controller = async (req, res, next) => {

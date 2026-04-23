@@ -37,6 +37,7 @@ type TGenericError = {
 };
 
 const errorMessages = {
+  rate_limit: 'You’ve reached your daily query limit of 30 queries. Please wait 24 hours before sending more queries.',
   [ErrorTypes.MODERATION]: 'com_error_moderation',
   [ErrorTypes.NO_USER_KEY]: 'com_error_no_user_key',
   [ErrorTypes.INVALID_USER_KEY]: 'com_error_invalid_user_key',

@@ -230,6 +230,31 @@ export default function useSSE(
           console.log(error);
         }
       }
+      // ✅ Add this block right here
+  /* @ts-ignore */
+  if (e.responseCode === 429) {
+    try {
+      const rateLimitData = JSON.parse(e.data);
+      errorHandler({
+        data: {
+          type: 'rate_limit',
+          // ✅ must be 'text', not 'message' — that's what errorHandler reads
+          text: JSON.stringify({ type: 'rate_limit', message: rateLimitData.message }),
+        } as any,
+        submission: { ...submission, userMessage } as EventSubmission,
+      });
+    } catch {
+      errorHandler({
+        data: {
+          text: JSON.stringify({ type: 'rate_limit', message: 'You’ve reached your daily query limit of 30 queries. Please wait 24 hours before sending more queries.' }),
+        } as any,
+        submission: { ...submission, userMessage } as EventSubmission,
+      });
+    }
+    setIsSubmitting(false);
+    setShowStopButton(false);
+    return;
+  }
 
       console.log('error in server stream.');
       (startupConfig?.balance?.enabled ?? false) && balanceQuery.refetch();

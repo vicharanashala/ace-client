@@ -312,6 +312,14 @@ const AgentController = async (req, res, next, initializeClient, addTitle) => {
       performCleanup();
     }
   } catch (error) {
+    // ✅ Handle rate limit error before handleAbortError touches the response
+  if (error?.status === 429 || res.statusCode === 429) {
+    if (!res.headersSent) {
+      res.status(429).json({ message: 'You’ve reached your daily query limit of 30 queries. Please wait 24 hours before sending more queries.' });
+    }
+    performCleanup();
+    return;
+  }
     // Handle error without capturing much scope
     handleAbortError(res, req, error, {
       conversationId,
